@@ -1,123 +1,49 @@
-## Gradio-Infinity
+# Gradio-Infinity
+![screenshoot.png](screenshoot.png)
+## Introduction
+The `Gradio-Infinity` project provides a Gradio - based graphical user interface for interacting with the Infinity database. The `interface.py` file is used to start the project, allowing users to perform various database operations through an intuitive interface.
 
-### Introduction to `main.py`
+## How to Start the Project Using `interface.py`
 
-The `main.py` file defines a singleton class `InfinityDatabaseSingleton` for interacting with the Infinity database. Here's a brief overview of its usage:
-
-#### 1. Initialization
-```python
-from main import InfinityDatabaseSingleton
-
-db_name = "my_db"
-table_name = "my_table"
-table_columns = {
-    "chunk_text": {"type": "varchar", "default": ""},
-    "file_uuid": {"type": "varchar", "default": ""},
-    "filename": {"type": "varchar", "default": ""},
-    "vector": {"type": "vector, 4, float"},
-}
-address = "/mnt/d/pycharmProject/infinity/TMP"
-singleton = InfinityDatabaseSingleton(db_name, table_name, table_columns, address)
+### Prerequisites
+- Make sure you have Python installed on your system.
+- Install the necessary dependencies. You can install them using the following command if you have a `requirements.txt` file:
+```bash
+pip install -r requirements.txt
 ```
-This code initializes a singleton instance of the database connection. If the database or table does not exist, it will be created.
+- The project currently only supports Linux. If you are using a non - Linux environment, you need to manually compile it (see [Issue #1286](https://github.com/infiniflow/infinity/issues/1286)).
 
-#### 2. Data Insertion
-```python
-data = [
-    {
-        "chunk_text": r"unnecessary and harmful",
-        "vector": [1.0, 1.2, 0.8, 0.9],
-        "filename": "test1.txt",
-        "file_uuid": "1234567890"
-    },
-    # more data...
-]
-singleton.insert_data(data)
+### Starting the Project
+1. Navigate to the project directory in the terminal.
+2. Run the following command to start the Gradio interface:
+```bash
+pip install infinity-embedded-sdk==0.6.0.dev3
 ```
-This inserts data into the table. Note that the `num` field in the data will be removed before insertion.
+3. Once the script is running, you will see an output indicating that the Gradio interface has been launched. Open the provided URL in your web browser to access the interface.
 
-#### 3. Index Creation
-```python
-singleton.create_indexes()
-```
-This creates a full - text index on the `chunk_text` column.
+### Using the Gradio Interface
+The Gradio interface provides several tabs for different database operations:
 
-#### 4. Query Execution
-```python
-questions = [
-    r"blooms",
-    r"Bloom filter",
-    # more questions...
-]
-query_results = singleton.perform_queries(questions)
-```
-This performs text matching queries on the `chunk_text` column and returns the results.
+#### Insert Data
+- Enter the `File UUID`, `filename`, `chunk_text`, and `vector` in the corresponding text boxes. The `vector` should be a 768 - dimensional vector, separated by commas.
+- Click the "插入数据" (Insert Data) button. The result of the insertion will be displayed in the output text box.
 
-#### 5. Dense Vector Search
-```python
-singleton.match_dense("vector", [1.0, 1.2, 0.8, 0.9], "float", "l2", 100)
-```
-This performs a dense vector search on the `vector` column.
+#### Delete Data
+- Enter the deletion condition in the text box.
+- Click the "删除数据" (Delete Data) button. The result of the deletion will be shown in the output text box.
 
-#### 6. Data Deletion
-```python
-singleton.delete_by_condition("filename = 'test1.txt'")
-```
-This deletes data that meets the specified condition.
+#### Search Data
+- Enter the search vector (768 - dimensional, separated by commas), `filename`, and the number of results to return (`top_k`).
+- Click the "搜索数据" (Search Data) button. The search results will be displayed in a dataframe.
 
-#### 7. Listing Data by Filename
-```python
-singleton.list_all_by_filename()
-```
-This groups data by `filename` and aggregates some information.
+#### Delete Table
+- Click the "删除表" (Delete Table) button. The result of the table deletion will be shown in the output text box.
 
-#### 8. Table Deletion
-```python
-singleton.delete_table(table_name)
-```
-This deletes the specified table.
+#### Delete Work Place
+- Click the "删除工作目录" (Delete Work Directory) button. The result of the deletion will be displayed in the output text box.
 
-
-### Introduction to `index.py`
-
-The `index.py` file creates a Gradio interface for interacting with the Infinity database using the `InfinityDatabaseSingleton` class from `main.py`.
-
-#### 1. Initialization
-```python
-from main import InfinityDatabaseSingleton
-import pandas as pd
-
-db_name = "my_db"
-table_name = "my_table"
-table_columns = {
-    "chunk_text": {"type": "varchar", "default": ""},
-    "file_uuid": {"type": "varchar", "default": ""},
-    "filename": {"type": "varchar", "default": ""},
-    "vector": {"type": "vector, 4, float"},
-}
-address = "/mnt/d/pycharmProject/infinity/TMP"
-db_singleton = InfinityDatabaseSingleton(db_name, table_name, table_columns, address)
-```
-This initializes the database singleton instance and inserts some sample data and creates an index.
-
-#### 2. Gradio Interface
-The Gradio interface provides the following functions:
-- **Insert Data**: Enter `file_uuid`, `filename`, `chunk_text`, and `vector`, then click the button to insert data.
-- **Delete Data**: Enter a deletion condition and click the button to delete data.
-- **Search Data**: Enter a search vector, `filename`, and the number of results to return, then click the button to perform a search.
-- **Delete Table**: Click the button to delete the table.
-- **Delete Work Place**: Click the button to delete the work directory.
-- **List All Data**: Click the button to list all data in the table.
-
-```python
-import gradio as gr
-
-with gr.Blocks() as demo:
-    gr.Markdown("### Infinity 数据库操作界面")
-    # Tabs and buttons...
-    demo.launch()
-```
-This code launches the Gradio interface, allowing users to interact with the database through a graphical user interface.
+#### List All Data
+- Click the "列出数据" (List Data) button. All the data in the table will be listed in a dataframe if the table exists.
 
 
 # Detailed Introduction to Infinity Database
@@ -181,6 +107,3 @@ According to the deployment environment (device energy consumption), search scen
 
 ### 5.4 Low Community Activity
 - The open - source community is currently less active. The speed of feature iteration and problem response may be limited, which is more suitable for teams with strong independent technical capabilities.
-
-## Conclusion
-Infinity database performs excellently in vector retrieval and hybrid search scenarios, especially suitable for scenarios with requirements for storage efficiency, index flexibility, and deep learning integration. Despite limitations such as platform compatibility and query optimization, its technical architecture and performance evaluation still provide important references for similar products. It is recommended to choose the deployment mode according to the specific business scale and technology stack, and pay attention to the community dynamics for continuous optimization support. 
