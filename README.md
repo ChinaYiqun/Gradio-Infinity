@@ -1,3 +1,125 @@
+## Gradio-Infinity
+
+### Introduction to `main.py`
+
+The `main.py` file defines a singleton class `InfinityDatabaseSingleton` for interacting with the Infinity database. Here's a brief overview of its usage:
+
+#### 1. Initialization
+```python
+from main import InfinityDatabaseSingleton
+
+db_name = "my_db"
+table_name = "my_table"
+table_columns = {
+    "chunk_text": {"type": "varchar", "default": ""},
+    "file_uuid": {"type": "varchar", "default": ""},
+    "filename": {"type": "varchar", "default": ""},
+    "vector": {"type": "vector, 4, float"},
+}
+address = "/mnt/d/pycharmProject/infinity/TMP"
+singleton = InfinityDatabaseSingleton(db_name, table_name, table_columns, address)
+```
+This code initializes a singleton instance of the database connection. If the database or table does not exist, it will be created.
+
+#### 2. Data Insertion
+```python
+data = [
+    {
+        "chunk_text": r"unnecessary and harmful",
+        "vector": [1.0, 1.2, 0.8, 0.9],
+        "filename": "test1.txt",
+        "file_uuid": "1234567890"
+    },
+    # more data...
+]
+singleton.insert_data(data)
+```
+This inserts data into the table. Note that the `num` field in the data will be removed before insertion.
+
+#### 3. Index Creation
+```python
+singleton.create_indexes()
+```
+This creates a full - text index on the `chunk_text` column.
+
+#### 4. Query Execution
+```python
+questions = [
+    r"blooms",
+    r"Bloom filter",
+    # more questions...
+]
+query_results = singleton.perform_queries(questions)
+```
+This performs text matching queries on the `chunk_text` column and returns the results.
+
+#### 5. Dense Vector Search
+```python
+singleton.match_dense("vector", [1.0, 1.2, 0.8, 0.9], "float", "l2", 100)
+```
+This performs a dense vector search on the `vector` column.
+
+#### 6. Data Deletion
+```python
+singleton.delete_by_condition("filename = 'test1.txt'")
+```
+This deletes data that meets the specified condition.
+
+#### 7. Listing Data by Filename
+```python
+singleton.list_all_by_filename()
+```
+This groups data by `filename` and aggregates some information.
+
+#### 8. Table Deletion
+```python
+singleton.delete_table(table_name)
+```
+This deletes the specified table.
+
+
+### Introduction to `index.py`
+
+The `index.py` file creates a Gradio interface for interacting with the Infinity database using the `InfinityDatabaseSingleton` class from `main.py`.
+
+#### 1. Initialization
+```python
+from main import InfinityDatabaseSingleton
+import pandas as pd
+
+db_name = "my_db"
+table_name = "my_table"
+table_columns = {
+    "chunk_text": {"type": "varchar", "default": ""},
+    "file_uuid": {"type": "varchar", "default": ""},
+    "filename": {"type": "varchar", "default": ""},
+    "vector": {"type": "vector, 4, float"},
+}
+address = "/mnt/d/pycharmProject/infinity/TMP"
+db_singleton = InfinityDatabaseSingleton(db_name, table_name, table_columns, address)
+```
+This initializes the database singleton instance and inserts some sample data and creates an index.
+
+#### 2. Gradio Interface
+The Gradio interface provides the following functions:
+- **Insert Data**: Enter `file_uuid`, `filename`, `chunk_text`, and `vector`, then click the button to insert data.
+- **Delete Data**: Enter a deletion condition and click the button to delete data.
+- **Search Data**: Enter a search vector, `filename`, and the number of results to return, then click the button to perform a search.
+- **Delete Table**: Click the button to delete the table.
+- **Delete Work Place**: Click the button to delete the work directory.
+- **List All Data**: Click the button to list all data in the table.
+
+```python
+import gradio as gr
+
+with gr.Blocks() as demo:
+    gr.Markdown("### Infinity 数据库操作界面")
+    # Tabs and buttons...
+    demo.launch()
+```
+This code launches the Gradio interface, allowing users to interact with the database through a graphical user interface.
+
+
 # Detailed Introduction to Infinity Database
 
 Infinity is a high - performance database focusing on vector data processing. It combines the capabilities of traditional databases with advanced indexing technologies, making it suitable for large - scale vector retrieval and hybrid search scenarios. The following is an in - depth introduction from the aspects of core functions, indexing capabilities, unique advantages, algorithm references, and limitations:
